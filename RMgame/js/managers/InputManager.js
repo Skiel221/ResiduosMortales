@@ -1,8 +1,4 @@
 class InputManager {
-    constructor() {
-        this.keys = {};
-    }
-    
     static keyPressed(keyCode) {
         this.keys[keyCode] = true;
     }

@@ -1,37 +1,25 @@
 // Variables globales
 let player;
 let platforms = [];
-let enemies = [];
-let gameState = "playing"; // playing, paused, gameOver
+let playerSprite;
+let platformSprite;
 
 // Precarga de assets
 function preload() {
     // Cargar imágenes
     playerSprite = loadImage('assets/images/characters/player.png');
-    enemySprite = loadImage('assets/images/characters/enemy.png');
     platformSprite = loadImage('assets/images/tiles/platform.png');
-    
-    // Cargar sonidos
-    jumpSound = loadSound('assets/sounds/sfx/jump.wav');
-    backgroundMusic = loadSound('assets/sounds/music/theme.mp3');
 }
 
 // Configuración inicial
 function setup() {
-    createCanvas(800, 600);
+    createCanvas(1000, 600);
     
     // Inicializar jugador
     player = new Player(width / 2, height / 2, playerSprite);
     
-    // Crear plataformas
-    platforms.push(new Platform(100, 500, 200, 30, platformSprite));
-    platforms.push(new Platform(400, 400, 200, 30, platformSprite));
-    
-    // Crear enemigos
-    enemies.push(new Enemy(300, 470, enemySprite));
-    
-    // Iniciar música
-    SoundManager.playBackgroundMusic();
+    // Crear un piso plano en la parte inferior
+    platforms.push(new Platform(0, height - 50, width, 50, platformSprite));
 }
 
 // Bucle principal
@@ -42,17 +30,6 @@ function draw() {
     for (let platform of platforms) {
         platform.update();
         platform.draw();
-    }
-    
-    // Actualizar y dibujar enemigos
-    for (let enemy of enemies) {
-        enemy.update();
-        enemy.draw();
-        
-        // Detectar colisiones con jugador
-        if (player.collidesWith(enemy)) {
-            gameState = "gameOver";
-        }
     }
     
     // Actualizar y dibujar jugador
@@ -66,48 +43,31 @@ function draw() {
             player.onCollision(platform);
         }
     }
-    
-    // Dibujar UI
-    drawUI();
-}
-
-// Dibujar interfaz de usuario
-function drawUI() {
-    push();
-    fill(0);
-    textSize(20);
-    text(`Puntuación: ${player.score}`, 20, 30);
-    
-    if (gameState === "gameOver") {
-        textSize(40);
-        textAlign(CENTER, CENTER);
-        text("GAME OVER", width / 2, height / 2);
-        textSize(20);
-        text("Presiona R para reiniciar", width / 2, height / 2 + 50);
-    }
-    pop();
 }
 
 // Manejo de teclas
 function keyPressed() {
-    InputManager.keyPressed(keyCode);
+    // Flecha arriba para saltar
+    if (keyCode === UP_ARROW) {
+        if (player.isGrounded) {
+            player.jump();
+        }
+    }
     
-    if (keyCode === 82 && gameState === "gameOver") { // Tecla R
-        resetGame();
+    // Tecla R para reiniciar (si lo necesitas)
+    if (keyCode === 82) { // Tecla R
+        player.reset();
+    }
+    
+    // Guardar el estado de la tecla para movimiento continuo
+    if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
+        InputManager.keyPressed(keyCode);
     }
 }
 
 function keyReleased() {
-    InputManager.keyReleased(keyCode);
-}
-
-// Reiniciar juego
-function resetGame() {
-    player.reset();
-    gameState = "playing";
-    
-    // Reiniciar enemigos
-    for (let enemy of enemies) {
-        enemy.reset();
+    // Liberar el estado de la tecla
+    if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
+        InputManager.keyReleased(keyCode);
     }
 }

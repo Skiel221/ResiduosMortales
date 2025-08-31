@@ -3,19 +3,18 @@ class Player {
         this.x = x;
         this.y = y;
         this.sprite = sprite;
-        this.width = 32;
-        this.height = 64;
+        this.width = 50;
+        this.height = 50;
         this.velocityX = 0;
         this.velocityY = 0;
         this.speed = 5;
         this.jumpForce = 15;
         this.isGrounded = false;
-        this.score = 0;
         this.facing = 1; // 1 derecha, -1 izquierda
     }
     
     update() {
-        // Movimiento horizontal
+        // Movimiento horizontal con flechas
         if (InputManager.isKeyDown(LEFT_ARROW)) {
             this.velocityX = -this.speed;
             this.facing = -1;
@@ -26,17 +25,17 @@ class Player {
             this.velocityX = 0;
         }
         
-        // Salto
-        if (InputManager.isKeyDown(32) && this.isGrounded) { // Espacio
-            this.jump();
-        }
-        
         // Aplicar movimiento
         this.x += this.velocityX;
         this.y += this.velocityY;
         
-        // Limitar al área de juego
+        // Limitar al área de juego (horizontalmente)
         this.x = constrain(this.x, 0, width - this.width);
+        
+        // Prevenir que salga por debajo de la pantalla
+        if (this.y > height) {
+            this.y = 0; // Teletransportar arriba (o puedes reiniciar)
+        }
     }
     
     applyGravity() {
@@ -44,26 +43,32 @@ class Player {
             this.velocityY += 0.5; // Gravedad
         }
         
-        // Limitar caída
-        this.velocityY = constrain(this.velocityY, -this.jumpForce, 10);
+        // Limitar velocidad de caída
+        this.velocityY = constrain(this.velocityY, -this.jumpForce, 20);
     }
     
     jump() {
         this.velocityY = -this.jumpForce;
         this.isGrounded = false;
-        SoundManager.playSfx(jumpSound);
     }
     
     draw() {
-        push();
-        // Voltear sprite según dirección
-        if (this.facing === -1) {
-            scale(-1, 1);
-            image(this.sprite, -this.x - this.width, this.y, this.width, this.height);
+        // Dibujar el sprite del jugador
+        if (this.sprite) {
+            push();
+            // Voltear sprite según dirección
+            if (this.facing === -1) {
+                scale(-1, 1);
+                image(this.sprite, -this.x - this.width, this.y, this.width, this.height);
+            } else {
+                image(this.sprite, this.x, this.y, this.width, this.height);
+            }
+            pop();
         } else {
-            image(this.sprite, this.x, this.y, this.width, this.height);
+            // Dibujo simple si no hay sprite
+            fill(255, 0, 0);
+            rect(this.x, this.y, this.width, this.height);
         }
-        pop();
     }
     
     collidesWith(object) {
@@ -89,7 +94,6 @@ class Player {
         this.y = height / 2;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.score = 0;
         this.isGrounded = false;
     }
 }
