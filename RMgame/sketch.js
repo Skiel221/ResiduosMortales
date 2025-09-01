@@ -3,23 +3,31 @@ let player;
 let platforms = [];
 let playerSprite;
 let platformSprite;
+let bgMusic;
+let jumpSound;
+let isPlaying = false;
 
 // Precarga de assets
 function preload() {
     // Cargar imágenes
     playerSprite = loadImage('assets/images/characters/player.png');
     platformSprite = loadImage('assets/images/tiles/platform.png');
+    bgMusic = loadSound('assets/sounds/music/theme.mp3');
+    jumpSound = loadSound('assets/sounds/sfx/jump.wav');
 }
 
 // Configuración inicial
 function setup() {
     createCanvas(1000, 600);
+
     
     // Inicializar jugador
     player = new Player(width / 2, height / 2, playerSprite);
     
     // Crear un piso plano en la parte inferior
     platforms.push(new Platform(0, height - 50, width, 50, platformSprite));
+
+    
 }
 
 // Bucle principal
@@ -43,6 +51,13 @@ function draw() {
             player.onCollision(platform);
         }
     }
+
+      // Cuando arranca el juego, si no está sonando la música, la iniciamos
+  if (!isPlaying) {
+    bgMusic.loop(); // loop para que siga sonando
+    isPlaying = true;
+  }
+  
 }
 
 // Manejo de teclas
@@ -51,6 +66,7 @@ function keyPressed() {
     if (keyCode === UP_ARROW) {
         if (player.isGrounded) {
             player.jump();
+            jumpSound.play();
         }
     }
     
@@ -63,6 +79,7 @@ function keyPressed() {
     if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
         InputManager.keyPressed(keyCode);
     }
+
 }
 
 function keyReleased() {
