@@ -5,7 +5,6 @@ let playerSprite;
 let platformSprite;
 let bgMusic;
 let jumpSound;
-let isPlaying = false;
 
 // Precarga de assets
 function preload() {
@@ -20,30 +19,33 @@ function preload() {
 function setup() {
     createCanvas(1000, 600);
 
-    
+    // Cuando arranca el juego, si no está sonando la música, la iniciamos
+
+    bgMusic.loop(); // loop para que siga sonando
+
+
     // Inicializar jugador
     player = new Player(width / 2, height / 2, playerSprite);
-    
+
     // Crear un piso plano en la parte inferior
     platforms.push(new Platform(0, height - 50, width, 50, platformSprite));
 
-    
 }
 
 // Bucle principal
 function draw() {
     background(135, 206, 235); // Color de cielo
-    
+
     // Actualizar y dibujar plataformas
     for (let platform of platforms) {
         platform.update();
         platform.draw();
     }
-    
+
     // Actualizar y dibujar jugador
     player.update();
     player.draw();
-    
+
     // Aplicar gravedad y verificar colisiones con plataformas
     player.applyGravity();
     for (let platform of platforms) {
@@ -52,12 +54,6 @@ function draw() {
         }
     }
 
-      // Cuando arranca el juego, si no está sonando la música, la iniciamos
-  if (!isPlaying) {
-    bgMusic.loop(); // loop para que siga sonando
-    isPlaying = true;
-  }
-  
 }
 
 // Manejo de teclas
@@ -69,15 +65,23 @@ function keyPressed() {
             jumpSound.play();
         }
     }
-    
+
     // Tecla R para reiniciar (si lo necesitas)
     if (keyCode === 82) { // Tecla R
         player.reset();
     }
-    
+
     // Guardar el estado de la tecla para movimiento continuo
     if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
         InputManager.keyPressed(keyCode);
+    }
+
+    if (keyCode === 77) { // Tecla M para silenciar/activar música
+        if (bgMusic.isPlaying()) {
+            bgMusic.pause();
+        } else {
+            bgMusic.loop();
+        }
     }
 
 }
