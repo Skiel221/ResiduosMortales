@@ -1,99 +1,114 @@
 class Player {
     constructor(x, y, sprite) {
-        this.x = x;
-        this.y = y;
         this.sprite = sprite;
-        this.width = 50;
-        this.height = 50;
-        this.velocityX = 0;
-        this.velocityY = 0;
-        this.speed = 5;
-        this.jumpForce = 15;
-        this.isGrounded = false;
-        this.facing = 1; // 1 derecha, -1 izquierda
+        this.width = 32;
+        this.height = 64;
+        
+        // Crear el cuerpo físico con Matter.js
+        this.body = Bodies.rectangle(x, y, this.width, this.height, {
+            friction: 0.3,
+            restitution: 0.2, // Reducir rebote
+            density: 0.8,     // Aumentar densidad para menos flotabilidad
+            inertia: Infinity, // Prevenir rotación
+            frictionAir: 0.01 // Muy poca fricción en el aire para mejor control
+        });
+        
+        // Añadir el cuerpo al mundo
+        Composite.add(engine.world, this.body);
+        
+        this.speed = 0.15;    // Velocidad reducida para mejor control
+        this.jumpForce = 8;   // Fuerza de salto reducida
+        this.facing = 1;      // 1 derecha, -1 izquierda
+        this.canJump = true;
+        this.jumpCooldown = 0;
     }
     
     update() {
         // Movimiento horizontal con flechas
         if (InputManager.isKeyDown(LEFT_ARROW)) {
-            this.velocityX = -this.speed;
+            Body.applyForce(this.body, this.body.position, { 
+                x: -this.speed, 
+                y: 0 
+            });
             this.facing = -1;
         } else if (InputManager.isKeyDown(RIGHT_ARROW)) {
-            this.velocityX = this.speed;
+            Body.applyForce(this.body, this.body.position, { 
+                x: this.speed, 
+                y: 0 
+            });
             this.facing = 1;
+        }
+        
+        // Limitar velocidad horizontal para mejor control
+        if (Math.abs(this.body.velocity.x) > 5) {
+            Body.setVelocity(this.body, { 
+                x: 5 * Math.sign(this.body.velocity.x), 
+                y: this.body.velocity.y 
+            });
+        }
+        
+        // Controlar el enfriamiento del salto
+        if (this.jumpCooldown > 0) {
+            this.jumpCooldown--;
+        } else if (!this.isGrounded()) {
+            this.canJump = false;
         } else {
-            this.velocityX = 0;
+            this.canJump = true;
         }
         
-        // Aplicar movimiento
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-        
-        // Limitar al área de juego (horizontalmente)
-        this.x = constrain(this.x, 0, width - this.width);
-        
-        // Prevenir que salga por debajo de la pantalla
-        if (this.y > height) {
-            this.y = 0; // Teletransportar arriba (o puedes reiniciar)
+        // Prevenir que el jugador salga de los límites horizontales
+        if (this.body.position.x < this.width / 2) {
+            Body.setPosition(this.body, { 
+                x: this.width / 2, 
+                y: this.body.position.y 
+            });
+        } else if (this.body.position.x > width - this.width / 2) {
+            Body.setPosition(this.body, { 
+                x: width - this.width / 2, 
+                y: this.body.position.y 
+            });
         }
-    }
-    
-    applyGravity() {
-        if (!this.isGrounded) {
-            this.velocityY += 0.5; // Gravedad
-        }
-        
-        // Limitar velocidad de caída
-        this.velocityY = constrain(this.velocityY, -this.jumpForce, 20);
     }
     
     jump() {
-        this.velocityY = -this.jumpForce;
-        this.isGrounded = false;
+        if (this.canJump) {
+            // Aplicar un impulso vertical controlado
+            Body.setVelocity(this.body, { 
+                x: this.body.velocity.x, 
+                y: -this.jumpForce 
+            });
+            this.canJump = false;
+            this.jumpCooldown = 10; // Pequeño cooldown para evitar saltos múltiples
+        }
+    }
+    
+    isGrounded() {
+        // Verificar si el jugador está cerca del suelo
+        return this.body.position.y > height - 100;
     }
     
     draw() {
+        // Obtener la posición del cuerpo
+        let pos = this.body.position;
+        
         // Dibujar el sprite del jugador
-        if (this.sprite) {
-            push();
-            // Voltear sprite según dirección
-            if (this.facing === -1) {
-                scale(-1, 1);
-                image(this.sprite, -this.x - this.width, this.y, this.width, this.height);
-            } else {
-                image(this.sprite, this.x, this.y, this.width, this.height);
-            }
-            pop();
+        push();
+        translate(pos.x, pos.y);
+        
+        // Voltear sprite según dirección
+        if (this.facing === -1) {
+            scale(-1, 1);
+            image(this.sprite, -this.width/2, -this.height/2, this.width, this.height);
         } else {
-            // Dibujo simple si no hay sprite
-            fill(255, 0, 0);
-            rect(this.x, this.y, this.width, this.height);
+            image(this.sprite, -this.width/2, -this.height/2, this.width, this.height);
         }
-    }
-    
-    collidesWith(object) {
-        return (
-            this.x < object.x + object.width &&
-            this.x + this.width > object.x &&
-            this.y < object.y + object.height &&
-            this.y + this.height > object.y
-        );
-    }
-    
-    onCollision(platform) {
-        // Colisión desde arriba
-        if (this.y + this.height <= platform.y + 10 && this.velocityY > 0) {
-            this.y = platform.y - this.height;
-            this.velocityY = 0;
-            this.isGrounded = true;
-        }
-    }
-    
-    reset() {
-        this.x = width / 2;
-        this.y = height / 2;
-        this.velocityX = 0;
-        this.velocityY = 0;
-        this.isGrounded = false;
+        pop();
+        
+        // Dibujar hitbox para depuración (puedes eliminar esto después)
+        noFill();
+        stroke(255, 0, 0);
+        rectMode(CENTER);
+        rect(pos.x, pos.y, this.width, this.height);
+        rectMode(CORNER);
     }
 }
