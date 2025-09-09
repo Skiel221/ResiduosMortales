@@ -4,8 +4,15 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'MiFuente';
+  src: url('../font/PressStart2P-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root{
     --p-color: #111;
     --s-color: #222;
-    --font: 'Poppins', sans-serif;
+    --font: 'MiFuente', sans-serif;
 }
