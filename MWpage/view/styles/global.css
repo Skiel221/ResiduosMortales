@@ -1,0 +1,11 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root{
+    --p-color: #111;
+    --s-color: #222;
+    --font: 'Poppins', sans-serif;
+}
