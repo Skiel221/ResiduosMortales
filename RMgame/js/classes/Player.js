@@ -16,40 +16,77 @@ class Player {
         // Añadir el cuerpo al mundo
         Composite.add(engine.world, this.body);
 
+        // Parámetros originales tuyos (no tocados)
         this.speed = .6;    // Velocidad reducida para mejor control
         this.jumpForce = 8;   // Fuerza de salto reducida
         this.facing = 1;      // 1 derecha, -1 izquierda
         this.canJump = true;
         this.jumpCooldown = 0;
+
+        // --- Propiedades del dash (añadidas) ---
+        this.isDashing = false;
+        this.dashSpeed = 15;       // velocidad durante dash (ajustable)
+        this.dashDuration = 10;    // duración en frames (~10 frames)
+        this.dashTimer = 0;
+        this.dashCooldown = 30;    // cooldown en frames entre dashes
+        this.dashCooldownTimer = 0;
+        this.onlyGroundDash = false; // true = solo en suelo
+        this._savedFrictionAir = this.body.frictionAir; // para restaurar al terminar dash
     }
 
     update() {
-        // Movimiento horizontal con flechas
-        if (InputManager.isKeyDown(LEFT_ARROW)) {
-            Body.applyForce(this.body, this.body.position, {
-                x: -this.speed,
-                y: 0
-            });
-            this.facing = -1;
-        } else if (InputManager.isKeyDown(RIGHT_ARROW)) {
-            Body.applyForce(this.body, this.body.position, {
-                x: this.speed,
-                y: 0
-            });
-            this.facing = 1;
-        }
+        // Reducir cooldowns
+        if (this.jumpCooldown > 0) this.jumpCooldown--;
+        if (this.dashCooldownTimer > 0) this.dashCooldownTimer--;
 
-        // Limitar velocidad horizontal para mejor control
-        if (Math.abs(this.body.velocity.x) > 5) {
+        // Si estamos en dash, forzamos la velocidad y manejamos el timer
+        if (this.isDashing) {
+            // Mantener velocidad constante durante el dash
             Body.setVelocity(this.body, {
-                x: 5 * Math.sign(this.body.velocity.x),
+                x: this.facing * this.dashSpeed,
                 y: this.body.velocity.y
             });
+
+            // Reducir timer
+            this.dashTimer--;
+            if (this.dashTimer <= 0) {
+                this.endDash();
+            }
+
+        } else {
+            // Movimiento horizontal con flechas (normal)
+            if (InputManager.isKeyDown(LEFT_ARROW)) {
+                Body.applyForce(this.body, this.body.position, {
+                    x: -this.speed,
+                    y: 0
+                });
+                this.facing = -1;
+            } else if (InputManager.isKeyDown(RIGHT_ARROW)) {
+                Body.applyForce(this.body, this.body.position, {
+                    x: this.speed,
+                    y: 0
+                });
+                this.facing = 1;
+            } else {
+                // Si no hay teclas, frenar (comportamiento que tenías)
+                Body.setVelocity(this.body, {
+                    x: 0,
+                    y: this.body.velocity.y
+                });
+            }
+
+            // Limitar velocidad horizontal para mejor control (no durante dash)
+            if (Math.abs(this.body.velocity.x) > 5) {
+                Body.setVelocity(this.body, {
+                    x: 5 * Math.sign(this.body.velocity.x),
+                    y: this.body.velocity.y
+                });
+            }
         }
 
-        // Controlar el enfriamiento del salto
+        // Controlar el enfriamiento del salto / estado grounded
         if (this.jumpCooldown > 0) {
-            this.jumpCooldown--;
+            // ya decrementado arriba
         } else if (!this.isGrounded()) {
             this.canJump = false;
         } else {
@@ -68,19 +105,6 @@ class Player {
                 y: this.body.position.y
             });
         }
-        if (InputManager.isKeyDown(LEFT_ARROW)) {
-            Body.applyForce(this.body, this.body.position, { x: -this.speed, y: 0 });
-            this.facing = -1;
-        } else if (InputManager.isKeyDown(RIGHT_ARROW)) {
-            Body.applyForce(this.body, this.body.position, { x: this.speed, y: 0 });
-            this.facing = 1;
-        } else {
-            // Si no hay teclas, frenar
-            Body.setVelocity(this.body, {
-                x: 0,
-                y: this.body.velocity.y
-            });
-        }
     }
 
     jump() {
@@ -95,8 +119,49 @@ class Player {
         }
     }
 
+    // Inicia el dash (llamar desde keyPressed)
+    dash() {
+        // No iniciar si en cooldown o ya dashing
+        if (this.dashCooldownTimer > 0 || this.isDashing) return;
+
+        // Si solo permitimos dash en suelo, chequear:
+        if (this.onlyGroundDash && !this.isGrounded()) return;
+
+        // Iniciar dash
+        this.isDashing = true;
+        this.dashTimer = this.dashDuration;
+        this.dashCooldownTimer = this.dashCooldown;
+
+        // Guardar y anular frictionAir temporalmente para evitar frenado
+        this._savedFrictionAir = this.body.frictionAir;
+        this.body.frictionAir = 0;
+
+        // Forzar la velocidad inicial del dash
+        Body.setVelocity(this.body, {
+            x: this.facing * this.dashSpeed,
+            y: this.body.velocity.y
+        });
+    }
+
+    // Finaliza el dash y restaura estados
+    endDash() {
+        this.isDashing = false;
+        // Restaurar frictionAir
+        this.body.frictionAir = this._savedFrictionAir;
+
+        // Limitar la velocidad tras terminar el dash para que no quede fuera de control
+        const maxAfterDash = 8;
+        if (Math.abs(this.body.velocity.x) > maxAfterDash) {
+            Body.setVelocity(this.body, {
+                x: maxAfterDash * Math.sign(this.body.velocity.x),
+                y: this.body.velocity.y
+            });
+        }
+    }
+
     isGrounded() {
         // Verificar si el jugador está cerca del suelo
+        // (si querés más precisión, después podemos usar colisiones reales con Matter.Events)
         return this.body.position.y > height - 100;
     }
 

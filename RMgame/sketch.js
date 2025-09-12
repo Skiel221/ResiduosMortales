@@ -94,3 +94,20 @@ function keyReleased() {
         InputManager.keyReleased(keyCode);
     }
 }
+
+function keyPressed() {
+    // Flecha arriba para saltar
+    if (keyCode === UP_ARROW && player.isGrounded()) {
+        player.jump();
+    }
+
+    // Dash con C (mayúscula o minúscula)
+    if (key === 'c' || key === 'C') {
+        player.dash();
+    }
+
+    // Guardar el estado de la tecla para movimiento continuo
+    if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
+        InputManager.keyPressed(keyCode);
+    }
+}
