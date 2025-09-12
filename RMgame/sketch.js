@@ -31,7 +31,7 @@ function setup() {
     world = engine.world;
     
     // Configurar gravedad más baja para un salto más controlable
-    engine.world.gravity.y = 0.8;
+    engine.world.gravity.y = 1.2;
     
     // Inicializar jugador con Matter.js
     player = new Player(width / 2, 300, playerSprite);
