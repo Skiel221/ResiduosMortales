@@ -6,7 +6,7 @@ class Player {
 
         // Crear el cuerpo físico con Matter.js
         this.body = Bodies.rectangle(x, y, this.width, this.height, {
-            friction: 0,
+            friction: .5,
             restitution: 0, // Reducir rebote
             density: 0.1,     // Aumentar densidad para menos flotabilidad
             inertia: Infinity, // Prevenir rotación
@@ -25,7 +25,7 @@ class Player {
 
         // --- Propiedades del dash (añadidas) ---
         this.isDashing = false;
-        this.dashSpeed = 15;       // velocidad durante dash (ajustable)
+        this.dashSpeed = 12;       // velocidad durante dash (ajustable)
         this.dashDuration = 10;    // duración en frames (~10 frames)
         this.dashTimer = 0;
         this.dashCooldown = 30;    // cooldown en frames entre dashes
@@ -162,7 +162,7 @@ class Player {
     isGrounded() {
         // Verificar si el jugador está cerca del suelo
         // (si querés más precisión, después podemos usar colisiones reales con Matter.Events)
-        return this.body.position.y > height - 100;
+        return this.body.position.y > height - 60;
     }
 
     draw() {
