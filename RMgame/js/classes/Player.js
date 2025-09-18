@@ -6,7 +6,7 @@ class Player {
 
         // Crear el cuerpo físico con Matter.js
         this.body = Bodies.rectangle(x, y, this.width, this.height, {
-            friction: .5,
+            friction: .08,
             restitution: 0, // Reducir rebote
             density: 0.1,     // Aumentar densidad para menos flotabilidad
             inertia: Infinity, // Prevenir rotación
@@ -18,7 +18,7 @@ class Player {
 
         // Parámetros originales tuyos (no tocados)
         this.speed = .6;    // Velocidad reducida para mejor control
-        this.jumpForce = 8;   // Fuerza de salto reducida
+        this.jumpForce = 10;   // Fuerza de salto reducida
         this.facing = 1;      // 1 derecha, -1 izquierda
         this.canJump = true;
         this.jumpCooldown = 0;

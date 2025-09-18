@@ -3,6 +3,9 @@ let player;
 let platforms = [];
 let playerSprite;
 let platformSprite;
+let enemy;
+let enemySprite;
+
 
 // Matter.js variables
 let Engine = Matter.Engine,
@@ -20,6 +23,7 @@ function preload() {
     // Cargar imágenes
     playerSprite = loadImage('assets/images/characters/player.png');
     platformSprite = loadImage('assets/images/tiles/platform.png');
+    enemySprite = loadImage('assets/images/characters/enemy.png');
 }
 
 // Configuración inicial
@@ -40,6 +44,8 @@ function setup() {
     platforms.push(new Platform(0, height - 25, width, 50, platformSprite, true)); // piso estático
     platforms.push(new Platform(100, 400, 200, 30, platformSprite, true));
     platforms.push(new Platform(400, 300, 200, 30, platformSprite, true));
+
+    enemy = new Enemy(500, 250, enemySprite, { width: 50, height: 70, speed: 1.6, patrolRange: 100 });
     
     // Ejecutar el motor
     Runner.run(engine);
@@ -59,6 +65,11 @@ function draw() {
     
     // Dibujar jugador
     player.draw();
+
+    if (enemy) {
+        enemy.update();
+        enemy.draw();
+    }   
     
     // Dibujar información de depuración
     drawDebugInfo();
