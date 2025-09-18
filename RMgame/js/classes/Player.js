@@ -7,47 +7,84 @@ class Player {
         // Crear el cuerpo físico con Matter.js
         this.body = Bodies.rectangle(x, y, this.width, this.height, {
             friction: .08,
-            restitution: 0, // Reducir rebote
-            density: 0.1,     // Aumentar densidad para menos flotabilidad
-            inertia: Infinity, // Prevenir rotación
-            frictionAir: 0 // Muy poca fricción en el aire para mejor control
+            restitution: 0,
+            density: 0.1,
+            inertia: Infinity,
+            frictionAir: 0
         });
 
         // Añadir el cuerpo al mundo
         Composite.add(engine.world, this.body);
 
         // Parámetros originales tuyos (no tocados)
-        this.speed = .6;    // Velocidad reducida para mejor control
-        this.jumpForce = 10;   // Fuerza de salto reducida
-        this.facing = 1;      // 1 derecha, -1 izquierda
+        this.speed = .6;
+        this.jumpForce = 10;
+        this.facing = 1;
         this.canJump = true;
         this.jumpCooldown = 0;
 
         // --- Propiedades del dash (añadidas) ---
         this.isDashing = false;
-        this.dashSpeed = 12;       // velocidad durante dash (ajustable)
-        this.dashDuration = 10;    // duración en frames (~10 frames)
+        this.dashSpeed = 12;
+        this.dashDuration = 10;
         this.dashTimer = 0;
-        this.dashCooldown = 30;    // cooldown en frames entre dashes
+        this.dashCooldown = 30;
         this.dashCooldownTimer = 0;
-        this.onlyGroundDash = false; // true = solo en suelo
-        this._savedFrictionAir = this.body.frictionAir; // para restaurar al terminar dash
+        this.onlyGroundDash = false;
+        this._savedFrictionAir = this.body.frictionAir;
+
+        // --- Sistema de vida ---
+        this.maxHealth = 100;
+        this.health = this.maxHealth;
+        this.healthDrainRate = 2; // puntos por segundo
+        this.alive = true;
+
+        // Opcional: callback para cuando muere (puedes sobrescribirlo)
+        this.onDeath = () => {
+            // por defecto dejamos el cuerpo estático y lo "congelamos"
+            try {
+                Body.setVelocity(this.body, { x: 0, y: 0 });
+                Body.setStatic(this.body, true);
+            } catch (e) {
+                // si Body no está disponible por alguna razón, ignorar
+            }
+        };
     }
 
     update() {
+        // Si está muerto no procesamos inputs ni físicas (puedes cambiar esto)
+        if (!this.alive) {
+            // aún dibujaremos la barra de vida en draw()
+            return;
+        }
+
         // Reducir cooldowns
         if (this.jumpCooldown > 0) this.jumpCooldown--;
         if (this.dashCooldownTimer > 0) this.dashCooldownTimer--;
 
+        // --- Drenado de vida por tiempo ---
+        // deltaTime es el tiempo en ms desde el último frame (p5)
+        // restamos healthDrainRate * segundos transcurridos
+        if (typeof deltaTime !== 'undefined') {
+            this.health -= this.healthDrainRate * (deltaTime / 1000);
+        } else {
+            // fallback si no existe deltaTime (no debería pasar)
+            this.health -= this.healthDrainRate / 60;
+        }
+        if (this.health <= 0 && this.alive) {
+            this.health = 0;
+            this.alive = false;
+            this.handleDeath();
+        }
+        if (this.health > this.maxHealth) this.health = this.maxHealth;
+
         // Si estamos en dash, forzamos la velocidad y manejamos el timer
         if (this.isDashing) {
-            // Mantener velocidad constante durante el dash
             Body.setVelocity(this.body, {
                 x: this.facing * this.dashSpeed,
                 y: this.body.velocity.y
             });
 
-            // Reducir timer
             this.dashTimer--;
             if (this.dashTimer <= 0) {
                 this.endDash();
@@ -108,48 +145,37 @@ class Player {
     }
 
     jump() {
-        if (this.canJump) {
-            // Aplicar un impulso vertical controlado
+        if (this.canJump && this.alive) {
             Body.setVelocity(this.body, {
                 x: this.body.velocity.x,
                 y: -this.jumpForce
             });
             this.canJump = false;
-            this.jumpCooldown = 10; // Pequeño cooldown para evitar saltos múltiples
+            this.jumpCooldown = 10;
         }
     }
 
-    // Inicia el dash (llamar desde keyPressed)
     dash() {
-        // No iniciar si en cooldown o ya dashing
-        if (this.dashCooldownTimer > 0 || this.isDashing) return;
-
-        // Si solo permitimos dash en suelo, chequear:
+        if (this.dashCooldownTimer > 0 || this.isDashing || !this.alive) return;
         if (this.onlyGroundDash && !this.isGrounded()) return;
 
-        // Iniciar dash
         this.isDashing = true;
         this.dashTimer = this.dashDuration;
         this.dashCooldownTimer = this.dashCooldown;
 
-        // Guardar y anular frictionAir temporalmente para evitar frenado
         this._savedFrictionAir = this.body.frictionAir;
         this.body.frictionAir = 0;
 
-        // Forzar la velocidad inicial del dash
         Body.setVelocity(this.body, {
             x: this.facing * this.dashSpeed,
             y: this.body.velocity.y
         });
     }
 
-    // Finaliza el dash y restaura estados
     endDash() {
         this.isDashing = false;
-        // Restaurar frictionAir
         this.body.frictionAir = this._savedFrictionAir;
 
-        // Limitar la velocidad tras terminar el dash para que no quede fuera de control
         const maxAfterDash = 8;
         if (Math.abs(this.body.velocity.x) > maxAfterDash) {
             Body.setVelocity(this.body, {
@@ -160,20 +186,44 @@ class Player {
     }
 
     isGrounded() {
-        // Verificar si el jugador está cerca del suelo
-        // (si querés más precisión, después podemos usar colisiones reales con Matter.Events)
         return this.body.position.y > height - 60;
+    }
+
+    // --- VIDA: métodos públicos ---
+    takeDamage(amount) {
+        if (!this.alive) return;
+        this.health -= amount;
+        if (this.health <= 0) {
+            this.health = 0;
+            this.alive = false;
+            this.handleDeath();
+        }
+    }
+
+    heal(amount) {
+        if (!this.alive) return;
+        this.health += amount;
+        if (this.health > this.maxHealth) this.health = this.maxHealth;
+    }
+
+    isAlive() {
+        return this.alive;
+    }
+
+    handleDeath() {
+        // Llamamos al callback y hacemos algunas cosas por defecto
+        this.onDeath();
+        // puedes añadir aquí animación de muerte, reproducir sonido, etc.
     }
 
     draw() {
         // Obtener la posición del cuerpo
         let pos = this.body.position;
 
-        // Dibujar el sprite del jugador
+        // Dibujar el sprite del jugador (si está vivo o no, lo mostramos diferente)
         push();
         translate(pos.x, pos.y);
 
-        // Voltear sprite según dirección
         if (this.facing === -1) {
             scale(-1, 1);
             image(this.sprite, -this.width / 2, -this.height / 2, this.width, this.height);
@@ -188,5 +238,48 @@ class Player {
         rectMode(CENTER);
         rect(pos.x, pos.y, this.width, this.height);
         rectMode(CORNER);
+
+        // --- HUD: barra de vida arriba a la izquierda ---
+        this.drawHealthBar();
+    }
+
+    drawHealthBar() {
+        const x = 12;
+        const y = 12;
+        const barW = 200;
+        const barH = 18;
+        const padding = 2;
+        // fondo de la barra
+        push();
+        noStroke();
+        fill(50); // fondo oscuro
+        rect(x - padding, y - padding, barW + padding * 2, barH + padding * 2, 4);
+
+        // color según % vida
+        const pct = this.health / this.maxHealth;
+        if (pct > 0.5) {
+            fill(0, 200, 0);
+        } else if (pct > 0.25) {
+            fill(230, 180, 0);
+        } else {
+            fill(200, 40, 40);
+        }
+
+        // barra de vida
+        rect(x, y, Math.max(0, barW * pct), barH, 4);
+
+        // borde
+        noFill();
+        stroke(0);
+        strokeWeight(1);
+        rect(x, y, barW, barH, 4);
+
+        // puntos d e salud
+        noStroke();
+        fill(255);
+        textSize(12);
+        textAlign(RIGHT, CENTER);
+        text(Math.round(this.health) + " / " + this.maxHealth, x + barW - 6, y + barH / 2);
+        pop();
     }
 }

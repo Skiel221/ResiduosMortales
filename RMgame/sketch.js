@@ -45,7 +45,7 @@ function setup() {
     platforms.push(new Platform(100, 400, 200, 30, platformSprite, true));
     platforms.push(new Platform(400, 300, 200, 30, platformSprite, true));
 
-    enemy = new Enemy(500, 250, enemySprite, { width: 50, height: 70, speed: 1.6, patrolRange: 100 });
+    enemy = new Enemy(500, 250, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 100 });
     
     // Ejecutar el motor
     Runner.run(engine);
@@ -69,7 +69,7 @@ function draw() {
     if (enemy) {
         enemy.update();
         enemy.draw();
-    }   
+    }
     
     // Dibujar información de depuración
     drawDebugInfo();
