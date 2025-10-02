@@ -6,7 +6,6 @@ let platformSprite;
 let enemy;
 let enemySprite;
 
-
 // Matter.js variables
 let Engine = Matter.Engine,
     Render = Matter.Render,
@@ -24,6 +23,8 @@ function preload() {
     playerSprite = loadImage('assets/images/characters/player.png');
     platformSprite = loadImage('assets/images/tiles/platform.png');
     enemySprite = loadImage('assets/images/characters/enemy.png');
+    backgroundSprite = loadImage('assets/images/backgrounds/fondo1.png');
+    //gasMaskSprite = loadImage('assets/images/items/gas-mask.png');
 }
 
 // Configuración inicial
@@ -47,13 +48,13 @@ function setup() {
 
     enemy = new Enemy(500, 250, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 100 });
     
-    // Ejecutar el motor
+    // Ejecutar el motor    
     Runner.run(engine);
 }
 
 // Bucle principal
 function draw() {
-    background(135, 206, 235); // Color de cielo
+    image(backgroundSprite, 0, 0, 1000, 600); // hace que ocupe toda la pantalla
     
     // Actualizar el jugador (para manejar input)
     player.update();
