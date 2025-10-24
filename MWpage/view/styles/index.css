@@ -25,7 +25,7 @@ body{
 .form{
     display: flex;
     flex-direction: column;
-    background-color: transparent; /* Cambiado */
+    background-color: #89e1f12f; /* Cambiado */
     border-radius: 8px;
     padding: 20px;
     gap: 20px;
