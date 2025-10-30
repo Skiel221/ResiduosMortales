@@ -1,0 +1,250 @@
+:root {
+    --accent: #8b6bff;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --glass: rgba(255, 255, 255, 0.08);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Fondo: GIF o video corto (reemplaza la ruta por tu gif) */
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: #111;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(19, 2, 43, 0.61), rgba(79, 17, 142, 0.418));
+    padding: 1rem;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: #fff;
+    
+}
+
+
+@keyframes flo {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-8px);
+    }
+}
+
+
+.brand img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 5px 5px 1px rgba(0, 0, 0, 0.25);
+    border: 1px solid #383838;
+    animation: flo 3s ease infinite;
+}
+
+nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+   
+    border-radius: 8px;
+
+}
+
+nav a {
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    align-items: center;
+    transition: transform 3s ease, background .3s ease;
+    font-size: 18px;
+    border: 2px solid #111;
+}
+
+nav a:hover {
+    transform: translateY(-3px);
+    background-color: #2c0d79;
+}
+
+/* Panel principal */
+main {
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    flex: 1 0 auto;
+}
+
+#panel-html {
+    position: relative;
+    width: 100%;
+    max-width: 980px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+    background: var(--glass);
+    animation: floatAndGlow 3s ease-in-out infinite;
+}
+
+/* Imagen de panel */
+.panel-img {
+    display: block;
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    filter: saturate(1.05) contrast(1.02);
+}
+
+@keyframes floatAndGlow {
+
+    0%,
+    100% {
+        transform: translateY(0);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    50% {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    }
+}
+
+/* Tarjeta de info encima de la imagen */
+.info-card {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    max-width: 460px;
+    background: var(--card-bg);
+    padding: 1rem 1rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.info-card .thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 0 0 72px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.info-card .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-card .content {
+    flex: 1 1 auto;
+}
+
+.info-card h3 {
+    margin: 0 0 0.35rem 0;
+    font-size: 1.05rem;
+}
+
+.info-card p {
+    margin: 0 0 0.6rem 0;
+    font-size: 0.92rem;
+    color: #333;
+}
+
+.info-card .actions {
+    display: flex;
+    align-items: center;
+    margin-top: 0.35rem;
+}
+
+.actions{
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    border: 0;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+    transition: all 0.3s;
+    
+}
+
+.btn.play {
+    background: linear-gradient(90deg, var(--accent), #2c0d79);
+    color: #fff;
+}
+
+.btn.info {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.307);
+}
+
+.btn:hover{
+    scale: calc(1.1);
+}
+
+/* Pequeña tarjeta fija en la parte inferior derecha */
+.floating-invite {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    background: var(--card-bg);
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/* Responsive */
+@media (max-width:720px) {
+    .info-card {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        padding: 0.75rem;
+        max-width: unset;
+    }
+
+    .panel-img {
+        height: 300px;
+    }
+
+    header {
+        padding: 0.45rem 0.8rem;
+    }
+
+    nav a {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.95rem;
+    }
+}
