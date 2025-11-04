@@ -1,0 +1,134 @@
+/* Paleta principal: violeta #7B2CBF, verde neón #00FF87, fondo oscuro #0B0B0E */
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #0B0B0E;
+    color: #EAEAEA;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.perfil-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.perfil-card {
+    background-color: #161622;
+    border: 2px solid #7B2CBF;
+    border-radius: 20px;
+    padding: 30px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 15px #7B2CBF33, 0 0 30px #00FF8733;
+    animation: aparecer 1s ease forwards;
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+        box-shadow: 0 0 0px #00FF8700;
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 25px #7a2cbf9c, 0 0 40px #00ff8881;
+    }
+}
+
+.avatar img {
+    cursor: pointer;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #00FF87;
+    box-shadow: 0 0 20px #00FF8766;
+}
+
+.nombre-usuario {
+    margin-top: 10px;
+    color: #00FF87;
+    font-size: 1.5em;
+    letter-spacing: 1px;
+}
+
+#perfil-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+        
+}
+
+#perfil-form label {
+    color: #EAEAEA;
+    font-size: 0.9em;
+    margin: 8px 0 5px;
+    text-align: left;
+}
+
+#perfil-form input {
+    align-items: center;
+     width: 94%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid #7B2CBF;
+    background-color: #0B0B0E;
+    color: #EAEAEA;
+    font-size: 0.95em;
+    margin-bottom: 5px;
+}
+
+#perfil-form input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.acciones {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    flex: 1;
+    background-color: #7B2CBF;
+    border: none;
+    border-radius: 10px;
+    color: #0B0B0E;
+    font-weight: bold;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.btn:hover {
+    background-color: #00FF87;
+    color: #0B0B0E;
+    box-shadow: 0 0 10px #00FF87;
+}
+
+.salir {
+    background-color: transparent;
+    border: 2px solid #7B2CBF;
+    color: #7B2CBF;
+}
+
+.salir:hover {
+    background-color: #7B2CBF;
+    color: #0B0B0E;
+    box-shadow: 0 0 10px #7B2CBF;
+}
+
+.guardar {
+    background-color: #00FF87;
+    color: #0B0B0E;
+}

@@ -1,33 +1,39 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
+include_once("../controller/conex.php");
 
-include("../controller/conex.php");
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = trim($_POST["email"]);
+    $password = trim($_POST["password"]);
 
-if (!empty($_POST["ingresar"])) { 
-    if (!empty($_POST["email"]) && !empty($_POST["password"])) {
-        $email = $_POST["email"];
-        $password = $_POST["password"];
-
-        $stmt = $conexion->prepare("SELECT * FROM users WHERE email = ?");
+    if ($email != "" && $password != "") {
+        // Buscar usuario existente
+        $stmt = $conn->prepare("SELECT id, email, password FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $resultado = $stmt->get_result();
 
-        if ($usuario = $resultado->fetch_object()) {
-            if (password_verify($password, $usuario->password)) {
-                $_SESSION["usuario"] = $usuario->email;
-                header("Location: ../pages/viewScore.php");
-                exit();
+        if ($resultado->num_rows > 0) {
+            $usuario = $resultado->fetch_assoc();
+
+            // Verificar contraseña
+            if (password_verify($password, $usuario["password"])) {
+                // Crear sesión
+                $_SESSION["user_id"] = $usuario["id"];
+                $_SESSION["email"] = $usuario["email"];
+                // Redirigir al panel o dashboard
+                header("Location: ../view/panel.php");
+                exit;
             } else {
-                echo "<script>alert('Contraseña incorrecta'); window.location='../index.php';</script>";
+                echo "❌ Contraseña incorrecta.";
             }
         } else {
-            echo "<script>alert('Usuario no encontrado'); window.location='../index.php';</script>";
+            echo "⚠️ No existe una cuenta con ese email.";
         }
+        $stmt->close();
     } else {
-        echo "<script>alert('Todos los campos son obligatorios'); window.location='../index.php';</script>";
+        echo "⚠️ Todos los campos son obligatorios.";
     }
 }
+$conn->close();
 ?>

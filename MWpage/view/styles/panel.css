@@ -10,6 +10,7 @@ body {
     margin: 0;
     min-height: 100vh;
     color: #111;
+    background-color: #0B0B0E;
 }
 
 header {
@@ -47,8 +48,8 @@ header {
     height: 56px;
     object-fit: cover;
     border-radius: 8px;
-    box-shadow: 5px 5px 1px rgba(0, 0, 0, 0.25);
-    border: 1px solid #383838;
+    box-shadow: 5px 5px 1px rgba(178, 5, 247, 0.507);
+    border: 1px solid #ab5ef3;
     animation: flo 3s ease infinite;
 }
 
@@ -167,7 +168,12 @@ main {
 
 .info-card h3 {
     margin: 0 0 0.35rem 0;
-    font-size: 1.05rem;
+    font-size: 1.18rem;
+    background-color: #2c0d7980;
+    padding: 5px;
+    width: fit-content;
+    border-radius: 5px;
+
 }
 
 .info-card p {

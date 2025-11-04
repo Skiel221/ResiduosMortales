@@ -3,20 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro - Mortal Wastes</title>
-  <link rel="stylesheet" href="../view/styles/global.css">
+  <title>Registrarse</title>
 </head>
 <body>
-  <div class="conteiner">
-    <div class="form-conteiner">
-      <h2>Crear cuenta</h2>
-      <form action="../model/register.php" method="post" class="form">
-        <input type="email" name="email" placeholder="Correo electrónico" class="input" required>
-        <input type="password" name="password" placeholder="Contraseña" class="input" required>
-        <button type="submit" class="start-btn">Registrarse</button>
-      </form>
-      <p>¿Ya tienes cuenta? <a href="../index.php">Inicia sesión</a></p>
-    </div>
-  </div>
+  <h2>Registro</h2>
+  <form action="../../model/register.php" method="POST">
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+
+    <label>Contraseña:</label><br>
+    <input type="password" name="password" required><br><br>
+
+    <label>Repetir contraseña:</label><br>
+    <input type="password" name="password2" required><br><br>
+
+    <button type="submit">Registrarse</button>
+  </form>
+
+  <p>¿Ya tenés cuenta? <a href="login.php">Iniciá sesión</a></p>
 </body>
 </html>

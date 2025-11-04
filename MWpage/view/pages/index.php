@@ -23,7 +23,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <input type="password" name="password" placeholder="Password" class="input" required>
         <button type="submit" name="ingresar" class="start-btn">Iniciar</button>
       </form>
-      <p>¿No tienes cuenta? <a href="pages/register.php">Registrate aquí</a></p>
+      <p>¿No tienes cuenta? <a href="register.php">Registrate aquí</a></p>
     </div>
   </div>
   <script src="view/javascript/logoMove.js"></script>

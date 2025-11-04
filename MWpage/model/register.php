@@ -1,27 +1,49 @@
 <?php
-include("../controller/conex.php");
+include_once("../controller/conex.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+    $email = trim($_POST["email"]);
+    $password = trim($_POST["password"]);
 
-    $check = $conexion->prepare("SELECT * FROM users WHERE email = ?");
-    $check->bind_param("s", $email);
-    $check->execute();
-    $result = $check->get_result();
-
-    if ($result->num_rows > 0) {
-        echo "<script>alert('El usuario ya existe'); window.location='../pages/register.php';</script>";
-    } else {
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conexion->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-        $stmt->bind_param("ss", $email, $password_hash);
-
-        if ($stmt->execute()) {
-            echo "<script>alert('Usuario registrado correctamente'); window.location='../index.php';</script>";
-        } else {
-            echo "<script>alert('Error al registrar'); window.location='../pages/register.php';</script>";
-        }
+    // Validaciones básicas
+    if (empty($email) || empty($password)) {
+        die("⚠️ Todos los campos son obligatorios.");
     }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("⚠️ El email no es válido.");
+    }
+
+    if (strlen($password) < 6) {
+        die("⚠️ La contraseña debe tener al menos 6 caracteres.");
+    }
+
+    // Verificar si el usuario ya existe
+    $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+
+    if ($resultado->num_rows > 0) {
+        echo "⚠️ Este usuario ya existe. <a href='../view/pages/index.php'>Iniciá sesión</a>";
+    } else {
+        // Insertar nuevo usuario
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $insert = $conn->prepare("INSERT INTO usuarios (email, password) VALUES (?, ?)");
+        $insert->bind_param("ss", $email, $password_hash);
+        $insert->execute();
+
+        if ($insert->affected_rows > 0) {
+            // Redirige automáticamente al login
+            header("Location: ../view/pages/index.php");
+            exit;
+        } else {
+            echo "❌ Error al registrar el usuario.";
+        }
+        $insert->close();
+    }
+
+    $stmt->close();
 }
+$conn->close();
 ?>
