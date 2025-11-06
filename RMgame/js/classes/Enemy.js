@@ -52,12 +52,12 @@ class Enemy {
             y: this.body.velocity.y
         });
 
-        // Evitar que salga del canvas
+        // Evitar que salga del nivel
         if (this.body.position.x < this.width / 2) {
             Body.setPosition(this.body, { x: this.width / 2, y: this.body.position.y });
             this.facing = 1;
-        } else if (this.body.position.x > width - this.width / 2) {
-            Body.setPosition(this.body, { x: width - this.width / 2, y: this.body.position.y });
+        } else if (this.body.position.x > LEVEL_WIDTH - this.width / 2) {
+            Body.setPosition(this.body, { x: LEVEL_WIDTH - this.width / 2, y: this.body.position.y });
             this.facing = -1;
         }
     }

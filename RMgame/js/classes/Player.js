@@ -130,15 +130,15 @@ class Player {
             this.canJump = true;
         }
 
-        // Prevenir que el jugador salga de los límites horizontales
+        // Prevenir que el jugador salga de los límites horizontales del nivel
         if (this.body.position.x < this.width / 2) {
             Body.setPosition(this.body, {
                 x: this.width / 2,
                 y: this.body.position.y
             });
-        } else if (this.body.position.x > width - this.width / 2) {
+        } else if (this.body.position.x > LEVEL_WIDTH - this.width / 2) {
             Body.setPosition(this.body, {
-                x: width - this.width / 2,
+                x: LEVEL_WIDTH - this.width / 2,
                 y: this.body.position.y
             });
         }
@@ -186,7 +186,7 @@ class Player {
     }
 
     isGrounded() {
-        return this.body.position.y > height - 60;
+        return this.body.position.y > LEVEL_HEIGHT - 60;
     }
 
     // --- VIDA: métodos públicos ---
@@ -244,8 +244,11 @@ class Player {
     }
 
     drawHealthBar() {
-        const x = 12;
-        const y = 12;
+        // Usar coordenadas de cámara para que la barra siga la vista
+        const camX = (typeof camera !== 'undefined') ? camera.x : 0;
+        const camY = (typeof camera !== 'undefined') ? camera.y : 0;
+        const x = camX + 12;
+        const y = camY + 12;
         const barW = 200;
         const barH = 18;
         const padding = 2;

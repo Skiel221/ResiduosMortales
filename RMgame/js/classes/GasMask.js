@@ -132,15 +132,17 @@ class GasMask {
     }
 
     _drawHUD() {
-        // icono arriba a la derecha
+        // icono arriba a la derecha - usar coordenadas de cámara
         push();
         imageMode(CORNER);
         textAlign(LEFT, CENTER);
         textSize(14);
 
-        // posición HUD (derecha superior)
-        const x = width - (this.hudIconSize + this.hudPadding) - 12;
-        const y = 12;
+        // posición HUD (derecha superior) - ajustada a cámara
+        const camX = (typeof camera !== 'undefined') ? camera.x : 0;
+        const camY = (typeof camera !== 'undefined') ? camera.y : 0;
+        const x = camX + width - (this.hudIconSize + this.hudPadding) - 12;
+        const y = camY + 12;
 
         // icon background
         noStroke();
