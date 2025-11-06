@@ -1,8 +1,4 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,14 +14,18 @@ if (session_status() === PHP_SESSION_NONE) {
       <div class="logo" id="logo">
         <img src="view/img/logo-move.avif" alt="">
       </div>
-      <form action="model/login.php" method="post" class="form">
+      <form action="../model/login.php" method="post" class="form">
         <input type="email" name="email" placeholder="Email" class="input" required>
         <input type="password" name="password" placeholder="Password" class="input" required>
         <button type="submit" name="ingresar" class="start-btn">Iniciar</button>
       </form>
-      <p>¿No tienes cuenta? <a href="register.php">Registrate aquí</a></p>
+      <p>¿No tienes cuenta? <a href="pages/register.php">Registrate aquí</a></p>
     </div>
   </div>
   <script src="view/javascript/logoMove.js"></script>
+    <?php 
+    include("../controller/conex.php");
+    include("../model/login.php");
+    ?>
 </body>
 </html>
