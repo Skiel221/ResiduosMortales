@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $resultado = $stmt->get_result();
 
     if ($resultado->num_rows > 0) {
-        echo "⚠️ Este usuario ya existe. <a href='../view/pages/index.php'>Iniciá sesión</a>";
+        echo "⚠️ Este usuario ya existe. <a href='../view/login.php'>Iniciá sesión</a>";
     } else {
         // Insertar nuevo usuario
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($insert->affected_rows > 0) {
             // Redirige automáticamente al login
-            header("Location: ../view/pages/index.php");
+            header("Location: ../view/login.php");
             exit;
         } else {
             echo "❌ Error al registrar el usuario.";

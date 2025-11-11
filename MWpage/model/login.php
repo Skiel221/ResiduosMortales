@@ -1,6 +1,8 @@
 <?php
-session_start();
-include_once("../controller/conex.php");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include('../controller/conex.php');
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
@@ -21,8 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // Crear sesión
                 $_SESSION["user_id"] = $usuario["id"];
                 $_SESSION["email"] = $usuario["email"];
+
                 // Redirigir al panel o dashboard
-                header("Location: ../view/panel.php");
+                header("Location: ../index.php");
                 exit;
             } else {
                 echo "❌ Contraseña incorrecta.";

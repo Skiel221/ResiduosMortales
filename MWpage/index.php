@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -23,7 +24,7 @@
         <li><a href="#inicio">Inicio</a></li>
         <li><a href="#juego">Juego</a></li>
         <li><a href="#manual">Manual</a></li>
-        <li><a href="../../index.php">Login</a></li>
+        <li><a href="view/login.php">Login</a></li>
       </ul>
     </nav>
   </header>
