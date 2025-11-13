@@ -12,7 +12,7 @@
 
   <header>
     <a class="brand" href="#">
-      <img src="../../../RMgame/assets/images/logo/logo-icon.png" alt="Logo del juego">
+      <img src="RMgame/assets/images/logo/logo-icon.png" alt="Logo del juego">
       <div>
         <strong>Residuos Mortales</strong>
         <div style="font-size:0.82rem; color: rgba(255,255,255,0.9);">Aventura pixelada</div>
@@ -23,25 +23,23 @@
       <ul>
         <li><a href="#inicio">Inicio</a></li>
         <li><a href="#juego">Juego</a></li>
-        <li><a href="#manual">Manual</a></li>
+        <li><a href="#manual">Manual</a></li> 
         <li><a href="view/login.php">Login</a></li>
       </ul>
     </nav>
   </header>
 
   <main>
-    <section id="panel-html">
-      <!-- Imagen principal del panel (reemplaza la ruta por tu imagen) -->
-      <img class="panel-img" src="../view/img/descarga (26).jpeg" alt="Panel del juego">
 
-      <!-- Tarjeta con info sobre el juego encima de la imagen -->
+    <section id="panel-html">
+      <img class="panel-img" src="view/img/descarga (26).jpeg" alt="Panel del juego">
       <article class="info-card" role="article" aria-label="Invitación a jugar">
-        <div class="thumb"><img src="../view/img/lo" alt="Mini imagen del juego"></div>
+        <div class="thumb"><img src="view/img/logo-text.png" alt="Mini imagen del juego"></div>
         <div class="content">
           <h3>¡Jugá ahora! </h3>
           <p>Sumergite en una aventura rápida: enfrenta desafíos, recoge objetos y limpia la zona contaminada. Partidas cortas y mucha diversión.</p>
           <div class="actions">
-            <button class="btn play" onclick="location.href='#juego'">Jugar</button>
+            <button class="btn play" onclick="location.href='RMgame/index.html'">Jugar</button>
             <button class="btn info" onclick="location.href='#manual'">Ver manual</button>
             
           </div>
