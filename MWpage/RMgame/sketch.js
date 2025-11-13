@@ -7,6 +7,11 @@ let enemy;
 let enemySprite;
 let gasMask;
 let gasMaskSprite;
+let keyItem;
+let keyItemSprite;
+let finalDoor;
+let finalDoorSprite;
+let score;
 
 // Variables de cámara
 let camera = {
@@ -33,6 +38,8 @@ function preload() {
     enemySprite = loadImage('assets/images/characters/enemy.png');
     backgroundSprite = loadImage('assets/images/backgrounds/fondo1.png');
     gasMaskSprite = loadImage('assets/images/items/gas-mask.png');
+    keyItemSprite = loadImage('assets/images/items/ItemPrimary.png');
+    finalDoorSprite = loadImage('assets/animations/FinalDoor.gif');
 }
 
 // Configuración inicial
@@ -73,6 +80,23 @@ function setup() {
         }
     );
 
+    keyItem = new ItemPrimary(
+        Math.min(LEVEL_WIDTH - 200, 900),
+        LEVEL_HEIGHT - 90,
+        keyItemSprite,
+        { width: 44, height: 44 }
+    );
+
+    finalDoor = new Final(
+        LEVEL_WIDTH - 180,
+        LEVEL_HEIGHT - 125,
+        finalDoorSprite,
+        { width: 80, height: 100 }
+    );
+
+    score = new Score(0);
+    score.start();
+
     // Ejecutar el motor    
     Runner.run(engine);
 }
@@ -91,7 +115,6 @@ function draw() {
         image(backgroundSprite, x, 0, 1000, LEVEL_HEIGHT);
     }
 
-    // Actualizar el jugador (para manejar input)
     player.update();
 
     // Dibujar plataformas
@@ -99,10 +122,14 @@ function draw() {
         platform.draw();
     }
 
-    // Actualizar y dibujar la máscara (antes de player.draw())
     if (gasMask) {
         gasMask.update(player);
         gasMask.draw();
+    }
+
+    if (keyItem) {
+        keyItem.update(player);
+        keyItem.draw();
     }
 
     // Dibujar jugador
@@ -111,6 +138,11 @@ function draw() {
     if (enemy) {
         enemy.update();
         enemy.draw();
+    }
+
+    if (finalDoor) {
+        finalDoor.update(player, keyItem && keyItem.collected, score);
+        finalDoor.draw(score);
     }
     
     // Restablecer transformación para UI
