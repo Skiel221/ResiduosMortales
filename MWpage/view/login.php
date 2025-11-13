@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mortal Wastes || Login</title>
-  <link rel="stylesheet" href="view/styles/global.css">
-  <link rel="stylesheet" href="view/styles/index.css">
+  <link rel="stylesheet" href="styles/global.css">
+  <link rel="stylesheet" href="styles/index.css">
 </head>
 <body>
   <div class="conteiner">
