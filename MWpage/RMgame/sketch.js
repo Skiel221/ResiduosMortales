@@ -6,6 +6,7 @@ let platformSprite;
 let enemy;
 let enemySprite;
 let gasMask;
+let gasMask2;
 let gasMaskSprite;
 let keyItem;
 let keyItemSprite;
@@ -53,43 +54,66 @@ function setup() {
     // Configurar gravedad más baja para un salto más controlable
     engine.world.gravity.y = 1.2;
 
-    // Inicializar jugador con Matter.js en el centro del nivel
-    player = new Player(LEVEL_WIDTH / 2, 300, playerSprite);
+    // Inicializar jugador según boceto: bloque verde al inicio (suelo)
+    // Altura: colocar al borde superior del suelo (suelo ~ y=550, player alto=64 => centro ~518)
+    player = new Player(40, 520, playerSprite);
 
-    // Crear plataformas con Matter.js
-    platforms.push(new Platform(0, LEVEL_HEIGHT - 25, LEVEL_WIDTH, 50, platformSprite, true)); // piso estático que cubre todo el nivel
-    platforms.push(new Platform(100, 400, 200, 30, platformSprite, true));
-    platforms.push(new Platform(400, 300, 200, 30, platformSprite, true));
-    platforms.push(new Platform(800, 350, 200, 30, platformSprite, true));
-    platforms.push(new Platform(1200, 250, 200, 30, platformSprite, true));
-    platforms.push(new Platform(1600, 400, 200, 30, platformSprite, true));
-    platforms.push(new Platform(2000, 300, 200, 30, platformSprite, true));
+    // Segmentos de suelo (centros y tamaños)
+    //(Posicion Eje X, Posicion Eje Y, Ancho, Alto, Sprite, Es Movible)
+    platforms.push(new Platform(0, (LEVEL_HEIGHT - 25), 300, 50, platformSprite, true));
+    platforms.push(new Platform(550, (LEVEL_HEIGHT - 25), 180, 50, platformSprite, true));
+    platforms.push(new Platform(1000, (LEVEL_HEIGHT - 25), 220, 50, platformSprite, true));
+    platforms.push(new Platform(1150, (LEVEL_HEIGHT - 25), 160, 50, platformSprite, true));
+    platforms.push(new Platform(1500, (LEVEL_HEIGHT - 25), 220, 50, platformSprite, true));
+    platforms.push(new Platform(1900, (LEVEL_HEIGHT - 25), 250, 50, platformSprite, true));
+    platforms.push(new Platform(2250, (LEVEL_HEIGHT - 140), 360, 50, platformSprite, true));
+    // Escalón cerca de la puerta
+    platforms.push(new Platform(1820, (LEVEL_HEIGHT - 25) - 60, 80, 20, platformSprite, true));
+    // Plataformas elevadas
+    platforms.push(new Platform(550, 320, 180, 30, platformSprite, true));
+    platforms.push(new Platform(1550, 320, 220, 30, platformSprite, true));
+    platforms.push(new Platform(2000, 320, 240, 30, platformSprite, true));
 
-    enemy = new Enemy(500, 250, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 100 });
+    // Enemy según boceto (bloque rojo en suelo, zona media)
+    enemy = new Enemy(1100, 505, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 120 });
 
     // Crear la máscara después de crear el jugador
+    // GasMask según boceto: dos círculos amarillos sobre plataformas elevadas
     gasMask = new GasMask(
-        LEVEL_WIDTH/3,     // x: un tercio del nivel
-        LEVEL_HEIGHT-50,  // y: un poco arriba del suelo
-        gasMaskSprite, 
+        600,     // centro de plataforma elevada izquierda
+        300,     // un poco por encima de la plataforma
+        gasMaskSprite,
         {
             width: 44,
             height: 44,
-            effectDuration: 12,    // duración del efecto en segundos
-            drainMultiplier: 0.2   // reduce el drain rate al 20%
+            effectDuration: 12,
+            drainMultiplier: 0.2
+        }
+    );
+    gasMask2 = new GasMask(
+        2000,   // plataforma elevada derecha
+        280,
+        gasMaskSprite,
+        {
+            width: 44,
+            height: 44,
+            effectDuration: 12,
+            drainMultiplier: 0.2
         }
     );
 
+    // ItemPrimary (círculo violeta) sobre plataforma elevada central
     keyItem = new ItemPrimary(
-        Math.min(LEVEL_WIDTH - 200, 900),
-        LEVEL_HEIGHT - 90,
+        1550,
+        260,
         keyItemSprite,
         { width: 44, height: 44 }
     );
 
+    // Puerta final (bloque azul) en el suelo hacia la derecha
     finalDoor = new Final(
-        LEVEL_WIDTH - 180,
-        LEVEL_HEIGHT - 125,
+        1800,
+        450, // suelo (top ~550) menos altura puerta (100)
         finalDoorSprite,
         { width: 80, height: 100 }
     );
@@ -125,6 +149,10 @@ function draw() {
     if (gasMask) {
         gasMask.update(player);
         gasMask.draw();
+    }
+    if (gasMask2) {
+        gasMask2.update(player);
+        gasMask2.draw();
     }
 
     if (keyItem) {
@@ -198,5 +226,12 @@ function keyReleased() {
     // Liberar el estado de la tecla
     if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
         InputManager.keyReleased(keyCode);
+    }
+}
+
+// Manejo de clic del mouse para el botón "Ver Puntuación"
+function mousePressed() {
+    if (finalDoor && typeof finalDoor.handleMousePressed === 'function') {
+        finalDoor.handleMousePressed(mouseX, mouseY);
     }
 }
