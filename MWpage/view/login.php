@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles/global.css">
   <link rel="stylesheet" href="styles/index.css">
 </head>
+
 <body>
   <div class="conteiner">
     <div class="form-conteiner">
@@ -18,14 +19,16 @@
         <input type="email" name="email" placeholder="Email" class="input" required>
         <input type="password" name="password" placeholder="Password" class="input" required>
         <button type="submit" name="ingresar" class="start-btn">Iniciar</button>
+        <p>¿No tienes cuenta? <a href="pages/register.php">Registrate aquí</a></p>
+
       </form>
-      <p>¿No tienes cuenta? <a href="pages/register.php">Registrate aquí</a></p>
     </div>
   </div>
-  <script src="view/javascript/logoMove.js"></script>
-    <?php 
+  <!-- <script src="view/javascript/logoMove.js"></script> -->
+  <?php 
     include("../controller/conex.php");
     include("../model/login.php");
     ?>
 </body>
+
 </html>

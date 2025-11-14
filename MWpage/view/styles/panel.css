@@ -5,11 +5,11 @@
   --text-light: rgba(255, 255, 255, 0.9);
   --bg-dark: #0B0B0E;
   /* --font-main: 'Poppins', system-ui, sans-serif; */
-  --font-main:KarmaFuture;
+    --font-main: var(--font);
 }
 
 @font-face {
-    font-family: "MiFuente";
+    font-family: "KarmaFuture";
     src: url("../font/KarmaFuture.ttf") format("truetype");
     font-weight: normal;
 }
