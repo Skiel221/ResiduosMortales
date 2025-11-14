@@ -3,14 +3,12 @@ class Platform {
         this.sprite = sprite;
         this.width = width;
         this.height = height;
-        
-        // Crear el cuerpo físico con Matter.js
         this.body = Bodies.rectangle(x + width/2, y + height/2, width, height, {
-            isStatic: isStatic, // si es estático no se moverá
-            friction: 0.5       // Aumentar fricción para mejor tracción
+            isStatic: isStatic,
+            friction: 0.5,
+            collisionFilter: { category: 0x0002, mask: 0x0001 | 0x0004 }
         });
-        
-        // Añadir el cuerpo al mundo
+        this.body.label = 'platform';
         Composite.add(engine.world, this.body);
     }
 

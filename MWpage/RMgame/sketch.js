@@ -62,17 +62,16 @@ function setup() {
     //(Posicion Eje X, Posicion Eje Y, Ancho, Alto, Sprite, Es Movible)
     platforms.push(new Platform(0, (LEVEL_HEIGHT - 25), 300, 50, platformSprite, true));
     platforms.push(new Platform(550, (LEVEL_HEIGHT - 25), 180, 50, platformSprite, true));
-    platforms.push(new Platform(1000, (LEVEL_HEIGHT - 25), 220, 50, platformSprite, true));
-    platforms.push(new Platform(1150, (LEVEL_HEIGHT - 25), 160, 50, platformSprite, true));
+    platforms.push(new Platform(1080, (LEVEL_HEIGHT - 25), 120, 50, platformSprite, true));
     platforms.push(new Platform(1500, (LEVEL_HEIGHT - 25), 220, 50, platformSprite, true));
-    platforms.push(new Platform(1900, (LEVEL_HEIGHT - 25), 250, 50, platformSprite, true));
+    platforms.push(new Platform(1960, (LEVEL_HEIGHT - 25), 250, 50, platformSprite, true));
     platforms.push(new Platform(2250, (LEVEL_HEIGHT - 140), 360, 50, platformSprite, true));
     // Escalón cerca de la puerta
-    platforms.push(new Platform(1820, (LEVEL_HEIGHT - 25) - 60, 80, 20, platformSprite, true));
+    platforms.push(new Platform(1780, (LEVEL_HEIGHT - 0) - 50, 120, 50, platformSprite, true));
     // Plataformas elevadas
-    platforms.push(new Platform(550, 320, 180, 30, platformSprite, true));
-    platforms.push(new Platform(1550, 320, 220, 30, platformSprite, true));
-    platforms.push(new Platform(2000, 320, 240, 30, platformSprite, true));
+    platforms.push(new Platform(550, 350, 180, 30, platformSprite, true));
+    platforms.push(new Platform(1400, 350, 220, 30, platformSprite, true));
+    platforms.push(new Platform(1970, 350, 240, 30, platformSprite, true));
 
     // Enemy según boceto (bloque rojo en suelo, zona media)
     enemy = new Enemy(1100, 505, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 120 });
@@ -80,8 +79,8 @@ function setup() {
     // Crear la máscara después de crear el jugador
     // GasMask según boceto: dos círculos amarillos sobre plataformas elevadas
     gasMask = new GasMask(
-        600,     // centro de plataforma elevada izquierda
-        300,     // un poco por encima de la plataforma
+        580,     // centro de plataforma elevada izquierda
+        320,     // un poco por encima de la plataforma
         gasMaskSprite,
         {
             width: 44,
@@ -92,7 +91,7 @@ function setup() {
     );
     gasMask2 = new GasMask(
         2000,   // plataforma elevada derecha
-        280,
+        320,
         gasMaskSprite,
         {
             width: 44,
@@ -104,10 +103,10 @@ function setup() {
 
     // ItemPrimary (círculo violeta) sobre plataforma elevada central
     keyItem = new ItemPrimary(
-        1550,
-        260,
+        1400,
+        300,
         keyItemSprite,
-        { width: 44, height: 44 }
+        { width: 35, height: 35 }
     );
 
     // Puerta final (bloque azul) en el suelo hacia la derecha
@@ -118,61 +117,56 @@ function setup() {
         { width: 80, height: 100 }
     );
 
+    player.setPlatforms(platforms);
+    player.setPlatforms(platforms);
+    player.attachGroundSensor(engine);
     score = new Score(0);
     score.start();
 
-    // Ejecutar el motor    
-    Runner.run(engine);
+    // Usaremos Engine.update en draw() con deltaTime de p5
 }
 
 // Bucle principal
 function draw() {
-    // Actualizar la cámara para seguir al jugador
+    // Actualizar lógica antes de la física
+    player.update();
+    if (enemy) enemy.update();
+    if (gasMask) gasMask.update(player);
+    if (gasMask2) gasMask2.update(player);
+    if (keyItem) keyItem.update(player);
+    if (finalDoor) finalDoor.update(player, keyItem && keyItem.collected, score);
+
+    // Avanzar física con deltaTime de p5
+    const dt = (typeof deltaTime !== 'undefined' ? deltaTime : 1000 / 60) * (typeof GAME_SPEED !== 'undefined' ? GAME_SPEED : 1);
+    Engine.update(engine, dt);
+
+    // Actualizar la cámara para seguir al jugador con posiciones físicas ya actualizadas
     updateCamera();
-    
+
     // Aplicar transformación de cámara
     push();
     translate(-camera.x, -camera.y);
-    
+
     // Dibujar fondo con repetición para cubrir todo el nivel
     for (let x = 0; x < LEVEL_WIDTH; x += 1000) {
         image(backgroundSprite, x, 0, 1000, LEVEL_HEIGHT);
     }
-
-    player.update();
 
     // Dibujar plataformas
     for (let platform of platforms) {
         platform.draw();
     }
 
-    if (gasMask) {
-        gasMask.update(player);
-        gasMask.draw();
-    }
-    if (gasMask2) {
-        gasMask2.update(player);
-        gasMask2.draw();
-    }
+    if (gasMask) gasMask.draw();
+    if (gasMask2) gasMask2.draw();
+    if (keyItem) keyItem.draw();
 
-    if (keyItem) {
-        keyItem.update(player);
-        keyItem.draw();
-    }
-
-    // Dibujar jugador
+    // Dibujar jugador y enemigos
     player.draw();
+    if (enemy) enemy.draw();
 
-    if (enemy) {
-        enemy.update();
-        enemy.draw();
-    }
+    if (finalDoor) finalDoor.draw(score);
 
-    if (finalDoor) {
-        finalDoor.update(player, keyItem && keyItem.collected, score);
-        finalDoor.draw(score);
-    }
-    
     // Restablecer transformación para UI
     pop();
 
@@ -207,7 +201,7 @@ function drawDebugInfo() {
 // Manejo de teclas
 function keyPressed() {
     // Flecha arriba para saltar
-    if (keyCode === UP_ARROW && player.isGrounded()) {
+    if (keyCode === UP_ARROW) {
         player.jump();
     }
 

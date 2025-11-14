@@ -10,14 +10,20 @@ class Player {
             restitution: 0,
             density: 0.1,
             inertia: Infinity,
-            frictionAir: 0
+            frictionAir: 0,
+            collisionFilter: { category: 0x0001, mask: 0x0002 }
         });
+        this.body.label = 'player';
+        this.footSensor = Bodies.rectangle(x, y + this.height / 2 + 4, this.width * 0.9, 6, { isSensor: true, collisionFilter: { category: 0x0004, mask: 0x0002 } });
+        this.footSensor.label = 'player_foot_sensor';
 
         // Añadir el cuerpo al mundo
         Composite.add(engine.world, this.body);
+        Composite.add(engine.world, this.footSensor);
 
         // Parámetros originales tuyos (no tocados)
-        this.speed = .6;
+        this.speed = .6; // mantenido para compatibilidad
+        this.runVelocity = 5;
         this.jumpForce = 10;
         this.facing = 1;
         this.canJump = true;
@@ -26,10 +32,10 @@ class Player {
         // --- Propiedades del dash (añadidas) ---
         this.isDashing = false;
         this.dashSpeed = 12;
-        this.dashDuration = 10;
-        this.dashTimer = 0;
-        this.dashCooldown = 30;
-        this.dashCooldownTimer = 0;
+        this.dashDurationMs = 10 * (1000 / 60);
+        this.dashTimerMs = 0;
+        this.dashCooldownMs = 30 * (1000 / 60);
+        this.dashCooldownTimerMs = 0;
         this.onlyGroundDash = false;
         this._savedFrictionAir = this.body.frictionAir;
 
@@ -49,6 +55,7 @@ class Player {
                 // si Body no está disponible por alguna razón, ignorar
             }
         };
+        this.groundContacts = 0;
     }
 
     update() {
@@ -58,9 +65,12 @@ class Player {
             return;
         }
 
+        Body.setPosition(this.footSensor, { x: this.body.position.x, y: this.body.position.y + this.height / 2 + 2 });
+
         // Reducir cooldowns
-        if (this.jumpCooldown > 0) this.jumpCooldown--;
-        if (this.dashCooldownTimer > 0) this.dashCooldownTimer--;
+        const dt = (typeof deltaTime !== 'undefined') ? deltaTime : (1000 / 60);
+        if (this.jumpCooldownMs > 0) this.jumpCooldownMs = Math.max(0, this.jumpCooldownMs - dt);
+        if (this.dashCooldownTimerMs > 0) this.dashCooldownTimerMs = Math.max(0, this.dashCooldownTimerMs - dt);
 
         // --- Drenado de vida por tiempo ---
         // deltaTime es el tiempo en ms desde el último frame (p5)
@@ -85,23 +95,23 @@ class Player {
                 y: this.body.velocity.y
             });
 
-            this.dashTimer--;
-            if (this.dashTimer <= 0) {
+            this.dashTimerMs -= dt;
+            if (this.dashTimerMs <= 0) {
                 this.endDash();
             }
 
         } else {
             // Movimiento horizontal con flechas (normal)
             if (InputManager.isKeyDown(LEFT_ARROW)) {
-                Body.applyForce(this.body, this.body.position, {
-                    x: -this.speed,
-                    y: 0
+                Body.setVelocity(this.body, {
+                    x: -this.runVelocity,
+                    y: this.body.velocity.y
                 });
                 this.facing = -1;
             } else if (InputManager.isKeyDown(RIGHT_ARROW)) {
-                Body.applyForce(this.body, this.body.position, {
-                    x: this.speed,
-                    y: 0
+                Body.setVelocity(this.body, {
+                    x: this.runVelocity,
+                    y: this.body.velocity.y
                 });
                 this.facing = 1;
             } else {
@@ -122,7 +132,7 @@ class Player {
         }
 
         // Controlar el enfriamiento del salto / estado grounded
-        if (this.jumpCooldown > 0) {
+        if (this.jumpCooldownMs > 0) {
             // ya decrementado arriba
         } else if (!this.isGrounded()) {
             this.canJump = false;
@@ -151,17 +161,17 @@ class Player {
                 y: -this.jumpForce
             });
             this.canJump = false;
-            this.jumpCooldown = 10;
+            this.jumpCooldownMs = 10 * (1000 / 60);
         }
     }
 
     dash() {
-        if (this.dashCooldownTimer > 0 || this.isDashing || !this.alive) return;
+        if (this.dashCooldownTimerMs > 0 || this.isDashing || !this.alive) return;
         if (this.onlyGroundDash && !this.isGrounded()) return;
 
         this.isDashing = true;
-        this.dashTimer = this.dashDuration;
-        this.dashCooldownTimer = this.dashCooldown;
+        this.dashTimerMs = this.dashDurationMs;
+        this.dashCooldownTimerMs = this.dashCooldownMs;
 
         this._savedFrictionAir = this.body.frictionAir;
         this.body.frictionAir = 0;
@@ -186,7 +196,40 @@ class Player {
     }
 
     isGrounded() {
-        return this.body.position.y > LEVEL_HEIGHT - 60;
+        const platforms = this.platformsRef || [];
+        if (platforms.length === 0) return false;
+        const bodies = platforms.map(p => p.body);
+        const pairs = Matter.Query.collides(this.footSensor, bodies);
+        return pairs.length > 0;
+    }
+
+    setPlatforms(platforms) {
+        this.platformsRef = platforms;
+    }
+    attachGroundSensor(engine) {
+        const Events = Matter.Events;
+        const isFoot = (b) => b === this.footSensor;
+        const isPlatform = (b) => b && b.label === 'platform';
+        Events.on(engine, 'collisionStart', (evt) => {
+            const pairs = evt.pairs || [];
+            for (let i = 0; i < pairs.length; i++) {
+                const a = pairs[i].bodyA;
+                const b = pairs[i].bodyB;
+                if ((isFoot(a) && isPlatform(b)) || (isFoot(b) && isPlatform(a))) {
+                    this.groundContacts++;
+                }
+            }
+        });
+        Events.on(engine, 'collisionEnd', (evt) => {
+            const pairs = evt.pairs || [];
+            for (let i = 0; i < pairs.length; i++) {
+                const a = pairs[i].bodyA;
+                const b = pairs[i].bodyB;
+                if ((isFoot(a) && isPlatform(b)) || (isFoot(b) && isPlatform(a))) {
+                    this.groundContacts = Math.max(0, this.groundContacts - 1);
+                }
+            }
+        });
     }
 
     // --- VIDA: métodos públicos ---
