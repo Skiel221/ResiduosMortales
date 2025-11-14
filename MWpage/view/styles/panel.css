@@ -1,10 +1,17 @@
 :root {
   --accent: #8b6bff;
-  --card-bg: rgba(255, 255, 255, 0.92);
+  --card-bg: rgba(255, 255, 255, 0.555);
   --glass: rgba(255, 255, 255, 0.08);
   --text-light: rgba(255, 255, 255, 0.9);
   --bg-dark: #0B0B0E;
-  --font-main: 'Poppins', system-ui, sans-serif;
+  /* --font-main: 'Poppins', system-ui, sans-serif; */
+  --font-main:KarmaFuture;
+}
+
+@font-face {
+    font-family: "MiFuente";
+    src: url("../font/KarmaFuture.ttf") format("truetype");
+    font-weight: normal;
 }
 
 /* Fondo general */
@@ -13,7 +20,6 @@ body {
   font-family: var(--font-main);
   color: #fff;
   background-color: var(--bg-dark);
-  background-image: url("../img/pixel-bg.gif"); /* si querés un fondo animado */
   background-size: cover;
   background-attachment: fixed;
 }
@@ -47,9 +53,17 @@ body {
 }
 
 @keyframes floatLogo {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-8px); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1); /* crece */
+  }
+  100% {
+    transform: scale(1); /* vuelve al tamaño normal */
+  }
 }
+
 
 .brand-text strong {
   font-size: 1.3rem;
@@ -85,13 +99,14 @@ body {
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   border: 2px solid #fff;
-  transition: all 0.3s ease;
+  transition: all 0.3s ;
 }
 
 .nav-link:hover {
-  transform: translateY(-3px);
-  background-color: var(--accent);
-  scale: 1.1;
+  transform: translateY(-3px) scale(1.2);
+  box-shadow: 3px 2px #ab5ef3;
+  background-color: #eee;
+  color: #8b6bff;
 }
 
 /* ===== MAIN PANEL ===== */
@@ -144,7 +159,7 @@ body {
   width: 70px;
   height: 70px;
   border-radius: 8px;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .panel-details h2 {
@@ -219,7 +234,7 @@ body {
 
 .manual-intro {
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.2rem;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
