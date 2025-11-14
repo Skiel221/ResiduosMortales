@@ -71,7 +71,7 @@
           <ul class="controls-list">
             <li><strong> / ←/ →:</strong> Mover al personaje</li>
             <li><strong>↑</strong> Saltar</li>
-            <li><strong>Enter:</strong> Disparar</li>
+            <li><strong>c:</strong> aumenta la velocidad </li>
           </ul>
         </div>
 
