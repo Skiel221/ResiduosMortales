@@ -69,7 +69,7 @@
         <div class="manual-controls">
           <h3>Controles del juego</h3>
           <ul class="controls-list">
-            <li><strong>W / A / S / D:</strong> Mover al personaje</li>
+            <li><strong> ↑/ ←/ →:</strong> Mover al personaje</li>
             <li><strong>Espacio:</strong> Saltar</li>
             <li><strong>Enter:</strong> Disparar</li>
           </ul>

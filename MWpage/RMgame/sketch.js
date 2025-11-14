@@ -35,7 +35,7 @@ let world;
 function preload() {
     // Cargar imágenes
     playerSprite = loadImage('assets/images/characters/player.png');
-    platformSprite = loadImage('assets/images/tiles/platform.png');
+    platformSprite = loadImage('assets/images/tiles/bloque.png');
     enemySprite = loadImage('assets/images/characters/enemy.png');
     backgroundSprite = loadImage('assets/images/backgrounds/fondo1.png');
     gasMaskSprite = loadImage('assets/images/items/gas-mask.png');
