@@ -31,20 +31,55 @@ let Engine = Matter.Engine,
 let engine;
 let world;
 
-// Precarga de assets
+// Declaraciones globales
+const backgroundPaths = [
+    'assets/images/backgrounds/fondo3-paisaje.png',
+    'assets/images/backgrounds/img-fondo-nubes2.png',
+    'assets/images/backgrounds/fondo1.png',
+    'assets/images/backgrounds/fond4.png'
+];
+let bgImages = [];
+let currentBackgroundIndex = 0;
+
+// En tu preload(), añadí la carga de todos los fondos:
 function preload() {
-    // Cargar imágenes
+    // otras cargas ya existentes...
     playerSprite = loadImage('assets/images/characters/player.png');
     platformSprite = loadImage('assets/images/tiles/bloque.png');
     enemySprite = loadImage('assets/images/characters/enemy.png');
-    backgroundSprite = loadImage('assets/images/backgrounds/fondo1.png');
     gasMaskSprite = loadImage('assets/images/items/gas-mask.png');
     keyItemSprite = loadImage('assets/images/items/ItemPrimary.png');
     finalDoorSprite = loadImage('assets/animations/FinalDoor.gif');
+
+    // Precargar todos los fondos en bgImages
+    for (let i = 0; i < backgroundPaths.length; i++) {
+        bgImages[i] = loadImage(backgroundPaths[i]);
+    }
+    // Asignar fondo inicial (por ejemplo el primero)
+    backgroundSprite = bgImages[0];
+    currentBackgroundIndex = 0;
 }
+
+// Función para cambiar instantáneamente a un fondo aleatorio ya precargado
+function changeBackgroundRandom() {
+    if (!bgImages || bgImages.length === 0) return;
+
+    let idx = Math.floor(Math.random() * bgImages.length);
+    if (bgImages.length > 1) {
+        while (idx === currentBackgroundIndex) {
+            idx = Math.floor(Math.random() * bgImages.length);
+        }
+    }
+    currentBackgroundIndex = idx;
+    backgroundSprite = bgImages[idx];
+    console.log('Background cambiado (preloaded) a:', backgroundPaths[idx]);
+}
+
 
 // Configuración inicial
 function setup() {
+    changeBackgroundRandom();
+
     createCanvas(800, 600);
 
     // Crear motor de Matter.js
@@ -178,7 +213,7 @@ function draw() {
 function updateCamera() {
     // Seguir al jugador horizontalmente
     camera.x = player.body.position.x - width / 2;
-    
+
     // Limitar la cámara para no salir de los límites del nivel
     camera.x = constrain(camera.x, 0, LEVEL_WIDTH - width);
     camera.y = 0; // No seguir verticalmente por ahora
