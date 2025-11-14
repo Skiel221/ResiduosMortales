@@ -52,12 +52,13 @@ body {
 }
 
 .form label{
-    padding-bottom: 5px;
+    padding: 5px;
 }
+
 /* 🟪 Inputs */
 .form input {
     background-color: #1b0033;
-    padding: 14px;
+    padding: 11px;
     font-size: 17px;
     border: 2px solid var(--morado);
     border-radius: 8px;
