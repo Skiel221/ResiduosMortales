@@ -69,7 +69,7 @@ function setup() {
     // Escalón cerca de la puerta
     platforms.push(new Platform(1780, (LEVEL_HEIGHT - 0) - 50, 120, 50, platformSprite, true));
     // Plataformas elevadas
-    platforms.push(new Platform(550, 350, 180, 30, platformSprite, true));
+    platforms.push(new Platform(550, 320, 600, 30, platformSprite, true));
     platforms.push(new Platform(1400, 350, 220, 30, platformSprite, true));
     platforms.push(new Platform(1970, 350, 240, 30, platformSprite, true));
 
@@ -80,7 +80,7 @@ function setup() {
     // GasMask según boceto: dos círculos amarillos sobre plataformas elevadas
     gasMask = new GasMask(
         580,     // centro de plataforma elevada izquierda
-        320,     // un poco por encima de la plataforma
+        290,     // un poco por encima de la plataforma
         gasMaskSprite,
         {
             width: 44,

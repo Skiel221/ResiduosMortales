@@ -8,6 +8,11 @@ class Final {
         this.completed = false;
         this.messageTimer = 0;
         this.messageText = "Encuentra el objeto clave para pasar el nivel";
+        this._btnBounds = null;
+        this._formShown = false;
+        this._nameInput = null;
+        this._submitBtn = null;
+        this._cancelBtn = null;
     }
 
     update(player, hasKey, score) {
@@ -102,13 +107,46 @@ class Final {
         const b = this._btnBounds;
         const inside = wx >= b.x && wx <= b.x + b.w && wy >= b.y && wy <= b.y + b.h;
         if (inside) {
-            try {
-                window.location.href = '../index.php';
-            } catch (e) {
-                console.log('Ir a índice falló:', e);
+            if (!this._formShown) {
+                this._formShown = true;
+                const cx = width / 2;
+                const cy = height / 2;
+                this._nameInput = createInput('');
+                this._nameInput.attribute('placeholder', 'Tu nombre');
+                this._nameInput.position(cx - 140, cy - 10);
+                this._nameInput.size(200);
+                this._submitBtn = createButton('Enviar');
+                this._submitBtn.position(cx + 70, cy - 12);
+                this._submitBtn.mousePressed(() => {
+                    const n = (this._nameInput && this._nameInput.value()) || '';
+                    const s = (typeof score !== 'undefined' && score) ? score.getFinalScore() : 0;
+                    const t = (typeof score !== 'undefined' && score) ? score.getElapsedSeconds() : 0;
+                    const body = new URLSearchParams({ name: n, score: String(s), time: String(t) }).toString();
+                    fetch('../model/viewScore.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
+                        .then(r => r.json()).then(j => {
+                            this._cleanupForm();
+                            window.location.href = '../index.php';
+                        }).catch(() => {
+                            this._cleanupForm();
+                            window.location.href = '../index.php';
+                        });
+                });
+                this._cancelBtn = createButton('Cancelar');
+                this._cancelBtn.position(cx + 70, cy + 18);
+                this._cancelBtn.mousePressed(() => {
+                    this._cleanupForm();
+                    window.location.href = '../index.php';
+                });
             }
             return true;
         }
         return false;
+    }
+
+    _cleanupForm() {
+        if (this._nameInput) { this._nameInput.remove(); this._nameInput = null; }
+        if (this._submitBtn) { this._submitBtn.remove(); this._submitBtn = null; }
+        if (this._cancelBtn) { this._cancelBtn.remove(); this._cancelBtn = null; }
+        this._formShown = false;
     }
 }
