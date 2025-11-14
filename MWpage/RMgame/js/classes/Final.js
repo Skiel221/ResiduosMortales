@@ -67,7 +67,48 @@ class Final {
             const pts = score ? score.getFinalScore() : 0;
             text("Tiempo: " + secs + "s", cx, cy - h / 2 + 48);
             text("Puntuación: " + pts, cx, cy - h / 2 + 74);
+
+            // Botón "Ver Puntuación" debajo de la puntuación
+            const btnW = 180;
+            const btnH = 36;
+            const btnX = cx - btnW / 2;
+            const btnY = cy - h / 2 + 106; // debajo de la línea de puntuación
+
+            // Guardar bounds para manejo de clic (coordenadas de mundo)
+            this._btnBounds = { x: btnX, y: btnY, w: btnW, h: btnH };
+
+            // Dibujar botón
+            noStroke();
+            fill(30, 144, 255);
+            rectMode(CORNER);
+            rect(btnX, btnY, btnW, btnH, 6);
+            fill(255);
+            textAlign(CENTER, CENTER);
+            textSize(16);
+            text("Ver Puntuación", btnX + btnW / 2, btnY + btnH / 2);
             pop();
+
+            
         }
+    }
+
+    handleMousePressed(mx, my) {
+        // Detectar clic en el botón convirtiendo a coordenadas de mundo
+        if (!this.completed || !this._btnBounds) return false;
+        const camX = typeof camera !== 'undefined' ? camera.x : 0;
+        const camY = typeof camera !== 'undefined' ? camera.y : 0;
+        const wx = mx + camX;
+        const wy = my + camY;
+        const b = this._btnBounds;
+        const inside = wx >= b.x && wx <= b.x + b.w && wy >= b.y && wy <= b.y + b.h;
+        if (inside) {
+            try {
+                window.location.href = '../index.php';
+            } catch (e) {
+                console.log('Ir a índice falló:', e);
+            }
+            return true;
+        }
+        return false;
     }
 }
