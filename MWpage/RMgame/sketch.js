@@ -13,6 +13,7 @@ let keyItemSprite;
 let finalDoor;
 let finalDoorSprite;
 let score;
+let deathZones = [];
 
 // Variables de cámara
 let camera = {
@@ -108,6 +109,8 @@ function setup() {
     platforms.push(new Platform(1400, 350, 220, 30, platformSprite, true));
     platforms.push(new Platform(1970, 350, 240, 30, platformSprite, true));
 
+    deathZones.push(new DeathZone(0, LEVEL_HEIGHT + 1, LEVEL_WIDTH, 400));
+
     // Enemy según boceto (bloque rojo en suelo, zona media)
     enemy = new Enemy(1100, 505, enemySprite, { width: 65, height: 90, speed: 1.6, patrolRange: 120 });
 
@@ -174,6 +177,8 @@ function draw() {
     // Avanzar física con deltaTime de p5
     const dt = (typeof deltaTime !== 'undefined' ? deltaTime : 1000 / 60) * (typeof GAME_SPEED !== 'undefined' ? GAME_SPEED : 1);
     Engine.update(engine, dt);
+
+    for (let dz of deathZones) { dz.update(player); }
 
     // Actualizar la cámara para seguir al jugador con posiciones físicas ya actualizadas
     updateCamera();
